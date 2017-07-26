@@ -164,11 +164,14 @@
     "clean": "babel-node tools/run clean",
     "copy": "babel-node tools/run copy",
     "bundle": "babel-node tools/run bundle",
+    "bundle:tenantb": "babel-node tools/run bundleTenantA",
     "build": "babel-node tools/run build",
     "build-stats": "yarn run build -- --release --analyse",
     "deploy": "babel-node tools/run deploy",
     "render": "babel-node tools/run render",
     "serve": "babel-node tools/run runServer",
-    "start": "babel-node tools/run start"
+    "start": "babel-node tools/run start",
+    "start:tenanta": "babel-node tools/run startTenantA",
+    "start:tenantb": "babel-node tools/run startTenantB"
   }
 }

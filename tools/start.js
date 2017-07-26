@@ -14,7 +14,7 @@ import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import createLaunchEditorMiddleware from 'react-error-overlay/middleware';
-import webpackConfig from './webpack.config';
+import { createTenantConfig } from './webpack.config';
 import run, { format } from './run';
 import clean from './clean';
 
@@ -63,14 +63,16 @@ let server;
  * Launches a development web server with "live reload" functionality -
  * synchronizing URLs, interactions and code changes across multiple devices.
  */
-async function start() {
+async function start(tenant) {
   if (server) return server;
   server = express();
   server.use(createLaunchEditorMiddleware());
   server.use(express.static(path.resolve(__dirname, '../public')));
 
   // Configure client-side hot module replacement
-  const clientConfig = webpackConfig.find(config => config.name === 'client');
+  const clientConfig = createTenantConfig(tenant).find(
+    config => config.name === 'client',
+  );
   clientConfig.entry.client = [
     'react-error-overlay',
     'react-hot-loader/patch',
@@ -100,7 +102,9 @@ async function start() {
   );
 
   // Configure server-side hot module replacement
-  const serverConfig = webpackConfig.find(config => config.name === 'server');
+  const serverConfig = createTenantConfig(tenant).find(
+    config => config.name === 'server',
+  );
   serverConfig.output.hotUpdateMainFilename = 'updates/[hash].hot-update.json';
   serverConfig.output.hotUpdateChunkFilename =
     'updates/[id].[hash].hot-update.js';
@@ -115,7 +119,7 @@ async function start() {
 
   // Configure compilation
   await run(clean);
-  const multiCompiler = webpack(webpackConfig);
+  const multiCompiler = webpack(createTenantConfig(tenant));
   const clientCompiler = multiCompiler.compilers.find(
     compiler => compiler.name === 'client',
   );

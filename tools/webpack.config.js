@@ -278,14 +278,14 @@ const config = {
 // Configuration for the client-side bundle (client.js)
 // -----------------------------------------------------------------------------
 
-const clientConfig = {
+const clientConfig = tenant => ({
   ...config,
 
   name: 'client',
   target: 'web',
 
   entry: {
-    client: ['babel-polyfill', './src/client.js'],
+    client: ['babel-polyfill', `./src/tenants/${tenant}/client.js`],
   },
 
   plugins: [
@@ -338,7 +338,6 @@ const clientConfig = {
             },
           }),
         ]),
-
     // Webpack Bundle Analyzer
     // https://github.com/th0r/webpack-bundle-analyzer
     ...(isAnalyze ? [new BundleAnalyzerPlugin()] : []),
@@ -353,20 +352,20 @@ const clientConfig = {
     net: 'empty',
     tls: 'empty',
   },
-};
+});
 
 //
 // Configuration for the server-side bundle (server.js)
 // -----------------------------------------------------------------------------
 
-const serverConfig = {
+const serverConfig = tenant => ({
   ...config,
 
   name: 'server',
   target: 'node',
 
   entry: {
-    server: ['babel-polyfill', './src/server.js'],
+    server: ['babel-polyfill', `./src/tenants/${tenant}/server.js`],
   },
 
   output: {
@@ -468,6 +467,10 @@ const serverConfig = {
     __filename: false,
     __dirname: false,
   },
-};
+});
 
 export default [clientConfig, serverConfig];
+
+export function createTenantConfig(tenant) {
+  return [clientConfig(tenant), serverConfig(tenant)];
+}
